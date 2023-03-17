@@ -47,9 +47,10 @@ async function getPrices(endpoint) {
     return await axios.get(endpoint)
 }
 
-function getHostName() {
-
+function getExchangeName(host) {
+    return host.replace(/^[^.]+\.|(\.\w+)$|\.[^.]+/g, '')
 }
+
 function getData(filename, exchanges) {
     fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
         if(err)
