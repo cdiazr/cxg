@@ -11,7 +11,8 @@ const activeExchanges = {
     'bitget': BitgetCXG
 }
 
-function getTablePrices(exchanges) {
+
+async function getTablePrices(exchanges) {
     endpoints = []
     prices = []
     awaitingResponses = []
@@ -22,33 +23,38 @@ function getTablePrices(exchanges) {
         awaitingResponses.push(endpoint)
     });
 
-    Promise.all(awaitingResponses).then((responses, k) => {
-        responses.forEach(response => {
+    const data = await Promise.all(awaitingResponses);
 
-            let host = response.request.host
-            exchanges.forEach(element => {
+    data.forEach(response => {
 
-                if(host.includes(element))
-                    currExchanger = element
+        let host = response.request.host
+        exchanges.forEach(element => {
 
-                let data
-                switch(currExchanger) {
-                    case 'binance':
-                        data = response.data
-                        break
-                    case 'kucoin':
-                    case 'bitget':
-                        data = response.data.data
-                }
-                getData('prices_' + element, data)
-                prices[element] = data
-            })
-        });
+            if(host.includes(element))
+                currExchanger = element
 
-        //console.log(prices)
-        return prices
-    })
+            let data
+            switch(currExchanger) {
+                case 'binance':
+                    data = response.data
+                    break
+                case 'kucoin':
+                case 'bitget':
+                    data = response.data.data
+            }
+            getData('prices_' + element, data)
+            prices[element] = data
+        })
+    });
+    return prices
+
 }
+getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
+
+    //Lo que sea que vayas a hacer con estos precios debes hacerlo dentro de este then, esta info no puede existir fuera de aqui 
+    console.log(precios)
+
+})
 
 async function getPrices(endpoint) {
     return await axios.get(endpoint)
@@ -62,6 +68,3 @@ function getData(filename, exchanges) {
         console.log("The file was saved!");
     });
 }
-
-const res = getTablePrices(['binance', 'kucoin', 'bitget'])
-//console.log(res)
