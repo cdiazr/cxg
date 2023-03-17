@@ -11,7 +11,7 @@ const activeExchanges = {
     'bitget': BitgetCXG
 }
 
-function getTablePrices(exchanges) {
+async function getTablePrices(exchanges) {
     endpoints = []
     prices = []
     awaitingResponses = []
@@ -22,38 +22,34 @@ function getTablePrices(exchanges) {
         awaitingResponses.push(endpoint)
     });
 
-    Promise.all(awaitingResponses).then((responses, k) => {
-        responses.forEach(response => {
+    const data = await Promise.all(awaitingResponses);
 
-            let host = response.request.host
-            exchanges.forEach(element => {
+    data.forEach(response => {
 
-                if(host.includes(element))
-                    currExchanger = element
+        let host = getExchangeName(response.request.host)
+        let data
+        switch(host) {
+            case 'binance':
+                data = response.data
+                break
+            case 'kucoin':
+            case 'bitget':
+                data = response.data.data
+        }
+        getData('prices_' + element, data)
+        prices[element] = data
+    });
 
-                let data
-                switch(currExchanger) {
-                    case 'binance':
-                        data = response.data
-                        break
-                    case 'kucoin':
-                    case 'bitget':
-                        data = response.data.data
-                }
-                getData('prices_' + element, data)
-                prices[element] = data
-            })
-        });
-
-        //console.log(prices)
-        return prices
-    })
+    return prices
 }
 
 async function getPrices(endpoint) {
     return await axios.get(endpoint)
 }
 
+function getHostName() {
+
+}
 function getData(filename, exchanges) {
     fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
         if(err)
@@ -63,5 +59,9 @@ function getData(filename, exchanges) {
     });
 }
 
-const res = getTablePrices(['binance', 'kucoin', 'bitget'])
-//console.log(res)
+getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
+
+    //Lo que sea que vayas a hacer con estos precios debes hacerlo dentro de este then, esta info no puede existir fuera de aqui 
+    console.log(precios)
+
+})
