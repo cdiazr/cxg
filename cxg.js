@@ -37,23 +37,30 @@ function getTablePrices(exchanges) {
                         data = response.data
                         break
                     case 'kucoin':
-                        data = response.data.ticker
-                        break
                     case 'bitget':
                         data = response.data.data
                 }
-
+                getData('prices_' + element, data)
                 prices[element] = data
             })
         });
 
-        console.log(prices)
+        //console.log(prices)
         return prices
     })
 }
 
 async function getPrices(endpoint) {
     return await axios.get(endpoint)
+}
+
+function getData(filename, exchanges) {
+    fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
+        if(err)
+            return console.log(err);
+
+        console.log("The file was saved!");
+    });
 }
 
 const res = getTablePrices(['binance', 'kucoin', 'bitget'])
