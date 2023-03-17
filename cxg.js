@@ -11,7 +11,6 @@ const activeExchanges = {
     'bitget': BitgetCXG
 }
 
-
 async function getTablePrices(exchanges) {
     endpoints = []
     prices = []
@@ -27,39 +26,30 @@ async function getTablePrices(exchanges) {
 
     data.forEach(response => {
 
-        let host = response.request.host
-        exchanges.forEach(element => {
-
-            if(host.includes(element))
-                currExchanger = element
-
-            let data
-            switch(currExchanger) {
-                case 'binance':
-                    data = response.data
-                    break
-                case 'kucoin':
-                case 'bitget':
-                    data = response.data.data
-            }
-            getData('prices_' + element, data)
-            prices[element] = data
-        })
+        let host = getExchangeName(response.request.host)
+        let data
+        switch(host) {
+            case 'binance':
+                data = response.data
+                break
+            case 'kucoin':
+            case 'bitget':
+                data = response.data.data
+        }
+        getData('prices_' + element, data)
+        prices[element] = data
     });
+
     return prices
-
 }
-getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
-
-    //Lo que sea que vayas a hacer con estos precios debes hacerlo dentro de este then, esta info no puede existir fuera de aqui 
-    console.log(precios)
-
-})
 
 async function getPrices(endpoint) {
     return await axios.get(endpoint)
 }
 
+function getHostName() {
+
+}
 function getData(filename, exchanges) {
     fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
         if(err)
@@ -68,3 +58,10 @@ function getData(filename, exchanges) {
         console.log("The file was saved!");
     });
 }
+
+getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
+
+    //Lo que sea que vayas a hacer con estos precios debes hacerlo dentro de este then, esta info no puede existir fuera de aqui 
+    console.log(precios)
+
+})
