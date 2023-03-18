@@ -36,7 +36,7 @@ async function getTablePrices(exchanges) {
             case 'bitget':
                 data = response.data.data
         }
-        getData('prices_' + element, data)
+
         prices[element] = data
     });
 
@@ -49,15 +49,6 @@ async function getPrices(endpoint) {
 
 function getExchangeName(host) {
     return host.replace(/^[^.]+\.|(\.\w+)$|\.[^.]+/g, '')
-}
-
-function getData(filename, exchanges) {
-    fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
-        if(err)
-            return console.log(err);
-
-        console.log("The file was saved!");
-    });
 }
 
 getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
