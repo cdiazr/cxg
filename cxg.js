@@ -1,24 +1,36 @@
-const axios = require('axios')
-const fs = require('fs');
+import axios from 'axios'
+import fs from 'fs';
 
-const BinanceCXG = require('./clients/binance')
-const KucoinCXG = require('./clients/kucoin')
-const BitgetCXG = require('./clients/bitget')
+import BinanceCXG from './clients/binance.js'
+import KucoinCXG from './clients/kucoin.js'
+import BitgetCXG from './clients/bitget.js'
+import KrakenCXG from './clients/kraken.js'
+import BitfinexCXG from './clients/kraken.js'
+import CoinbaseCXG from './clients/coinbase.js'
+import GeminiCXG from './clients/gemini.js'
+import BitstampCXG from './clients/bitstamp.js'
 
 const activeExchanges = {
     'binance': BinanceCXG,
     'kucoin': KucoinCXG,
-    'bitget': BitgetCXG
+    'bitget': BitgetCXG,
+    'kraken': KrakenCXG,
+    'kraken': BitfinexCXG,
+    'coinbase': CoinbaseCXG,
+    'gemini': GeminiCXG,
+    'bitstamp': BitstampCXG,
 }
 
 async function getTablePrices(exchanges) {
-    endpoints = []
-    prices = []
-    awaitingResponses = []
+    let prices = []
+    let awaitingResponses = []
+
+    // Connecting to each given exchanger and retrieving their data
     exchanges.forEach(element => {
         let client = new activeExchanges[element]()
-        let endpoint = axios.get(client.getDataRequested('tickers'))
+        let endpoint = axios.get(client.getDataRequested('prices'))
 
+        // Recording all promises
         awaitingResponses.push(endpoint)
     });
 
@@ -27,28 +39,21 @@ async function getTablePrices(exchanges) {
     data.forEach(response => {
 
         let host = getExchangeName(response.request.host)
-        let data
-        switch(host) {
-            case 'binance':
-                data = response.data
-                break
-            case 'kucoin':
-            case 'bitget':
-                data = response.data.data
-        }
-        getData('prices_' + element, data)
-        prices[element] = data
+
+        let client = new activeExchanges[host]()
+        let data = client.getFilteredPrices(response)
+
+        prices.push({[host]: data})
     });
 
     return prices
 }
 
-async function getPrices(endpoint) {
-    return await axios.get(endpoint)
-}
-
 function getExchangeName(host) {
-    return host.replace(/^[^.]+\.|(\.\w+)$|\.[^.]+/g, '')
+    let dotsNum = host.match(/\./g).length
+    let pattern = dotsNum == 2? /^[^.]+\.|(\.\w+)$|\.[^.]+/g : /(\.\w+)$|\.[^.]+/g;
+
+    return host.replace(pattern, '')
 }
 
 function getData(filename, exchanges) {
@@ -60,9 +65,6 @@ function getData(filename, exchanges) {
     });
 }
 
-getTablePrices(['binance', 'kucoin', 'bitget']).then( precios => {
-
-    //Lo que sea que vayas a hacer con estos precios debes hacerlo dentro de este then, esta info no puede existir fuera de aqui 
-    console.log(precios)
-
+getTablePrices(['binance', 'kucoin', 'gemini']).then( priceTable => {
+    console.log(priceTable[2])
 })
