@@ -56,15 +56,6 @@ function getExchangeName(host) {
     return host.replace(pattern, '')
 }
 
-function getData(filename, exchanges) {
-    fs.writeFile(`${filename}.json`, JSON.stringify(exchanges), function(err) {
-        if(err)
-            return console.log(err);
-
-        console.log("The file was saved!");
-    });
-}
-
 getTablePrices(['binance', 'kucoin', 'gemini']).then( priceTable => {
     console.log(priceTable[2])
 })
