@@ -1,4 +1,4 @@
-module.exports = class BinanceCXG {
+export default class BinanceCXG {
   'use strict'
 
   constructor() {
@@ -13,22 +13,28 @@ module.exports = class BinanceCXG {
     this.public_endpoints = {
       'aggTrades': '/api/v3/aggTrades',
       'avgPrice': '/api/v3/avgPrice',
+      'bookTicker': '/api/v3/bookTicker',
+      'dayTicker': '/api/v3/24hr',
       'depth': '/api/v3/depth',
       'info': '/api/v3/exchangeInfo',
       'klines': '/api/v3/klines',
       'ping': '/api/v3/ping',
-      'ticker': '/api/v3/ticker',
-      'dayTicker': '/api/v3/24hr',
-      'bookTicker': '/api/v3/bookTicker',
       'price': '/api/v3/price',
+      'prices': '/api/v3/ticker/price',
+      'ticker': '/api/v3/ticker',
       'time': '/api/v3/time',
       'trades': '/api/v3/trades',
       'uiKlines': '/api/v3/uiKlines',
-      'tickers': '/api/v3/ticker/price'
     }
   }
 
   getDataRequested(endpoint, host = 0) {
     return `${this.host[host]}${this.public_endpoints[endpoint]}`
+  }
+
+  getFilteredPrices(response) {
+    let json = response.data
+
+    return json
   }
 }
