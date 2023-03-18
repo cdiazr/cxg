@@ -3,12 +3,12 @@ export default class BitgetCXG {
 
     constructor() {
       this.host = [
-        'https://api.bitget.com'
+        'https://api.gemini.com/'
       ]
 
       this.public_endpoints = {
-        'symbols': '/api/spot/v1/public/currencies',
-        'prices': '/api/spot/v1/market/tickers'
+        'symbols': '/v1/symbols',
+        'prices': '/v1/pricefeed'
       }
     }
 
@@ -17,7 +17,7 @@ export default class BitgetCXG {
     }
 
     getFilteredPrices(response) {
-      let json = response.data.data
+      let json = response.data
 
       return json
     }
