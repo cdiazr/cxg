@@ -10,21 +10,23 @@ export default class BinanceCXG {
       'https://api4.binance.com'
     ]
 
+    this.version = '/api/v3'
+
     this.public_endpoints = {
-      'aggTrades': '/api/v3/aggTrades',
-      'avgPrice': '/api/v3/avgPrice',
-      'bookTicker': '/api/v3/bookTicker',
-      'dayTicker': '/api/v3/24hr',
-      'depth': '/api/v3/depth',
-      'info': '/api/v3/exchangeInfo',
-      'klines': '/api/v3/klines',
-      'ping': '/api/v3/ping',
-      'price': '/api/v3/price',
-      'prices': '/api/v3/ticker/price',
-      'ticker': '/api/v3/ticker',
-      'time': '/api/v3/time',
-      'trades': '/api/v3/trades',
-      'uiKlines': '/api/v3/uiKlines',
+      'aggTrades': this.version + '/aggTrades',
+      'avgPrice': this.version + '/avgPrice',
+      'bookTicker': this.version + '/bookTicker',
+      'dayTicker': this.version + '/24hr',
+      'depth': this.version + '/depth',
+      'info': this.version + '/exchangeInfo',
+      'klines': this.version + '/klines',
+      'ping': this.version + '/ping',
+      'price': this.version + '/price',
+      'prices': this.version + '/ticker/price',
+      'ticker': this.version + '/ticker',
+      'time': this.version + '/time',
+      'trades': this.version + '/trades',
+      'uiKlines': this.version + '/uiKlines',
     }
   }
 
@@ -33,8 +35,17 @@ export default class BinanceCXG {
   }
 
   getFilteredPrices(response) {
+    let array = {}
     let json = response.data
 
-    return json
+    json.forEach(res => {
+      let symbol = res['symbol']
+      let asset = symbol.substring(symbol.length - 4)
+      if (asset == 'USDT') {
+        array[symbol.replace(asset, '')] = res['price']
+      }
+    })
+
+    return array
   }
 }

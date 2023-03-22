@@ -6,10 +6,13 @@ export default class KucoinCXG {
             'https://api.kucoin.com'
         ]
 
+        this.version = '/api/v1'
+        this.version2 = '/api/v2'
+
         this.public_endpoints = {
-            'symbols': '/api/v2/symbols',
-            'prices': '/api/v1/prices',
-            'tickers': '/api/v1/market/allTickers',
+            'symbols': this.version2 + '/symbols',
+            'prices': this.version + '/prices',
+            'tickers': this.version + '/market/allTickers',
         }
     }
 

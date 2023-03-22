@@ -6,10 +6,11 @@ export default class KrakenCXG {
             'https://api.kraken.com'
         ]
 
+        this.version = '/0/public'
         this.public_endpoints = {
-            'assets': '/0/public/Assets',
-            'status': '/0/public/SystemStatus',
-            'time': '/0/public/Time',
+            'assets': this.version + '/Assets',
+            'status': this.version + '/SystemStatus',
+            'time': this.version + '/Time',
         }
     }
 

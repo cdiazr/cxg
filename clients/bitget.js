@@ -6,9 +6,11 @@ export default class BitgetCXG {
         'https://api.bitget.com'
       ]
 
+      this.version = '/api/spot/v1'
+
       this.public_endpoints = {
-        'symbols': '/api/spot/v1/public/currencies',
-        'prices': '/api/spot/v1/market/tickers'
+        'symbols': this.version + '/public/currencies',
+        'prices': this.version + '/market/tickers'
       }
     }
 

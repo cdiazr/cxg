@@ -6,9 +6,11 @@ export default class BitgetCXG {
         'https://api.gemini.com/'
       ]
 
+      this.v1 = '/v1'
+
       this.public_endpoints = {
-        'symbols': '/v1/symbols',
-        'prices': '/v1/pricefeed'
+        'symbols': this.v1 + '/symbols',
+        'prices': this.v1 + '/pricefeed'
       }
     }
 
@@ -17,8 +19,17 @@ export default class BitgetCXG {
     }
 
     getFilteredPrices(response) {
+      let array = {}
       let json = response.data
 
-      return json
+      json.forEach(res => {
+        let symbol = res['pair']
+        let asset = symbol.substring(symbol.length - 3)
+        if (asset == 'USD') {
+          array[symbol.replace(asset, '')] = res['price']
+        }
+      })
+
+      return array
     }
 }
