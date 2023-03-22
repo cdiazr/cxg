@@ -43,7 +43,7 @@ async function getTablePrices(exchanges) {
         let client = new activeExchanges[host]()
         let data = client.getFilteredPrices(response)
 
-        prices.push({[host]: data})
+        prices.push({name: host, data: data})
     });
 
     return prices
@@ -57,5 +57,37 @@ function getExchangeName(host) {
 }
 
 getTablePrices(['binance', 'kucoin', 'gemini']).then( priceTable => {
-    console.log(priceTable[2])
+    let counter = 0
+    let cryptoPrices = []
+
+    priceTable.forEach(result => {
+        let exchanger = result.name
+        let prices = result.data
+
+        let keys = Object.entries(prices);
+
+        // Construye la colección con los precios de cada crypto en los diferentes exchangers
+        keys.forEach(item => {
+            if(!counter)
+                cryptoPrices.push({symbol: item[0], exchangers: [
+                    {
+                        name: exchanger, price: item[1]
+                    }]
+                })
+            else {
+                if (cryptoPrices != undefined) {
+                    const symbol = cryptoPrices.find(row => row.symbol === item[0])
+
+                    if(symbol != undefined) {
+                        symbol.exchangers.push({name: exchanger, price: item[1]})
+                    }
+                }
+
+                return false
+            }
+        })
+
+        counter++
+
+    })
 })
