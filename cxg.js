@@ -56,23 +56,61 @@ function getExchangeName(host) {
     return host.replace(pattern, '')
 }
 
+function searchDiffs(objectData) {
+    const array = []
+    objectData.forEach(symbol => {
+        if(symbol.exchangers.length == 3) {
+            let maxDiff = 0;
+            for (let i = 0; i < symbol.exchangers.length; i++) {
+                for (let j = i + 1; j < symbol.exchangers.length; j++) {
+                    const price1 = parseFloat(symbol.exchangers[i].price);
+                    const price2 = parseFloat(symbol.exchangers[j].price);
+                    const diff = Math.abs(price1 - price2);
+                    if (diff > maxDiff)
+                        maxDiff = diff;
+
+                }
+            }
+
+            const maxPrice = Math.max(...symbol.exchangers.map(ex => parseFloat(ex.price)));
+            const minPrice = Math.min(...symbol.exchangers.map(ex => parseFloat(ex.price)));
+            const avgPrice = (maxPrice + minPrice) / 2;
+            const percentDiff = (maxDiff / avgPrice) * 100;
+            const amountDiff = maxPrice - minPrice;
+
+            symbol.diff.percent = percentDiff;
+            symbol.diff.amount = amountDiff;
+
+            array.push(symbol)
+        }
+    })
+
+    return array
+}
+
 getTablePrices(['binance', 'kucoin', 'gemini']).then( priceTable => {
     let counter = 0
     let cryptoPrices = []
 
+    // Construye la colección con los precios de cada crypto en los diferentes exchangers
     priceTable.forEach(result => {
         let exchanger = result.name
         let prices = result.data
 
         let keys = Object.entries(prices);
 
-        // Construye la colección con los precios de cada crypto en los diferentes exchangers
+        // Main object
         keys.forEach(item => {
             if(!counter)
-                cryptoPrices.push({symbol: item[0], exchangers: [
-                    {
-                        name: exchanger, price: item[1]
-                    }]
+                cryptoPrices.push({
+                    symbol: item[0],
+                    exchangers: [
+                        {name: exchanger, price: item[1]}
+                    ],
+                    diff: {
+                        percent: 0,
+                        amount: 0
+                    }
                 })
             else {
                 if (cryptoPrices != undefined) {
@@ -88,6 +126,9 @@ getTablePrices(['binance', 'kucoin', 'gemini']).then( priceTable => {
         })
 
         counter++
-
     })
+
+    // Searching differences
+    const result = searchDiffs(cryptoPrices)
+    console.log(result)
 })
